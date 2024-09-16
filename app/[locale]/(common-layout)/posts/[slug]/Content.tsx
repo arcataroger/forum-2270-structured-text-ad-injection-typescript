@@ -4,14 +4,20 @@ import CTAAppBlock from '@/components/blocksWithVariants/AppCtaRecord/CTAAppBloc
 import CTABlock from '@/components/blocksWithVariants/CtaButtonWithImageRecord/CTABlock';
 import NewsletterCTABlock from '@/components/blocksWithVariants/NewsletterSubscriptionRecord/NewsletterCTABlock';
 import TagButton from '@/components/blocksWithVariants/TagButton';
-
 import DatoImage from '@/components/DatoImage';
 import Highlighter from '@/components/Highlighter';
 import type {ContentPage} from '@/components/WithRealTimeUpdates/types';
 import DateIcon from '@/components/svgs/DateIcon';
 import {buildUrl} from '@/utils/globalPageProps';
 import transformDate from '@/utils/transformDate';
-import {isBlockquote, isHeading, isLink, isParagraph,} from 'datocms-structured-text-utils';
+import {
+    isBlockquote,
+    isHeading,
+    isLink,
+    isParagraph,
+    type RenderRule,
+    type TrasformFn
+} from 'datocms-structured-text-utils';
 import Link from 'next/link';
 import {notFound} from 'next/navigation';
 import {renderNodeRule, StructuredText, type StructuredTextDocument} from 'react-datocms';
@@ -26,11 +32,58 @@ const Content: ContentPage<PageProps, Query> = ({
         notFound();
     }
 
+    const originalNodeRules = [
+        renderNodeRule(isHeading, ({children, key}) => {
+            return (
+                <h3
+                    className="mb-4 mt-9 text-xl font-bold text-black dark:text-white sm:text-2xl lg:text-xl xl:text-2xl"
+                    key={key}
+                >
+                    {children}
+                </h3>
+            );
+        }),
+        renderNodeRule(isParagraph, ({children, key}) => {
+            return (
+                <div
+                    className="text-base font-medium leading-relaxed text-body-color sm:text-lg sm:leading-relaxed"
+                    key={key}
+                >
+                    {children}
+                </div>
+            );
+        }),
+        renderNodeRule(isLink, ({node, children, key}) => {
+            const attributeObject =
+                node.meta?.reduce(
+                    (acc, {id, value}) => {
+                        acc[id] = value;
+                        return acc;
+                    },
+                    {} as Record<string, string>,
+                ) || {};
+
+            return (
+                <a
+                    className="text-base font-medium leading-relaxed text-body-color underline sm:text-lg sm:leading-relaxed"
+                    href={node.url}
+                    key={key}
+                    {...attributeObject}
+                >
+                    {children}
+                </a>
+            );
+        }),
+        renderNodeRule(isBlockquote, ({children, key}) => {
+            return <QuoteBlock key={key}>{children}</QuoteBlock>;
+        }),
+    ]
+
 
     /** First we define our custom types */
 
-    // The node to be injected
-    type DFPNode = { type: 'dfp' };
+    // Create a new type for our injected node
+    type DFPNode = { type: 'dfp'}
 
     // We'll extend StructuredTextDocument from react-datocms
     interface StructuredTextDocumentWithDFP extends StructuredTextDocument {
@@ -46,14 +99,13 @@ const Content: ContentPage<PageProps, Query> = ({
         } & PostQuery['post']
     }
 
-
     /** Then we'll inject the nodes */
     const originalStructuredText = data.post.content // Equal to PostQuery.post.content
     const originalStructuredTextTopLevelNodes = originalStructuredText.value as StructuredTextDocument // This imported typedef is better than what graphql-typegen gives us
     const dfpNode = {type: 'dfp'} as DFPNode; // Our new placeholder node to be injected
 
     // Copying the children into our new type
-    let newChildren = {...originalStructuredTextTopLevelNodes.document.children} as StructuredTextDocumentWithDFP['document']['children']
+    let newChildren = [...originalStructuredTextTopLevelNodes.document.children] as StructuredTextDocumentWithDFP['document']['children']
 
     // Modify the array in-place
     if (newChildren.length >= 2) {
@@ -78,6 +130,18 @@ const Content: ContentPage<PageProps, Query> = ({
         ...originalStructuredText,
         value: newStructuredTextToplevelNodes
     } as PostQueryWithDFP['post']['content']
+
+    // Define a new render rule
+    const dfpNodeRule: RenderRule<TrasformFn, TrasformFn, TrasformFn> = renderNodeRule(
+        // @ts-expect-error The node renderer doesn't understand our custom (fake) node type, but that's OK
+        (node) => node.type === 'dfp',
+        () => {
+            return <div style={{width: '100px', height: '100px', background: 'orange', padding: '10px', margin: "auto"}}>AD GOES HERE</div>;
+        }
+    )
+
+    // Add it to the existing list of render rules
+    const nodeRulesWithDFP = [...originalNodeRules, dfpNodeRule]
 
     return (
         <section className="mt-40 pb-[120px]">
@@ -211,52 +275,8 @@ const Content: ContentPage<PageProps, Query> = ({
                                                 return null;
                                         }
                                     }}
-                                    customNodeRules={[
-                                        renderNodeRule(isHeading, ({children, key}) => {
-                                            return (
-                                                <h3
-                                                    className="mb-4 mt-9 text-xl font-bold text-black dark:text-white sm:text-2xl lg:text-xl xl:text-2xl"
-                                                    key={key}
-                                                >
-                                                    {children}
-                                                </h3>
-                                            );
-                                        }),
-                                        renderNodeRule(isParagraph, ({children, key}) => {
-                                            return (
-                                                <div
-                                                    className="text-base font-medium leading-relaxed text-body-color sm:text-lg sm:leading-relaxed"
-                                                    key={key}
-                                                >
-                                                    {children}
-                                                </div>
-                                            );
-                                        }),
-                                        renderNodeRule(isLink, ({node, children, key}) => {
-                                            const attributeObject =
-                                                node.meta?.reduce(
-                                                    (acc, {id, value}) => {
-                                                        acc[id] = value;
-                                                        return acc;
-                                                    },
-                                                    {} as Record<string, string>,
-                                                ) || {};
+                                    customNodeRules={nodeRulesWithDFP}
 
-                                            return (
-                                                <a
-                                                    className="text-base font-medium leading-relaxed text-body-color underline sm:text-lg sm:leading-relaxed"
-                                                    href={node.url}
-                                                    key={key}
-                                                    {...attributeObject}
-                                                >
-                                                    {children}
-                                                </a>
-                                            );
-                                        }),
-                                        renderNodeRule(isBlockquote, ({children, key}) => {
-                                            return <QuoteBlock key={key}>{children}</QuoteBlock>;
-                                        }),
-                                    ]}
                                 />
                                 <div className="mt-16 items-center justify-between sm:flex">
                                     <div className="mb-5">
