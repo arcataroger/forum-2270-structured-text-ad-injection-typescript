@@ -1,0 +1,12 @@
+query DocumentationHomePage {
+  documentationHome {
+    seo: _seoMetaTags {
+      attributes
+      content
+      tag
+    }
+    title
+    subheader
+    ...FeaturedDocumentationPages
+  }
+}

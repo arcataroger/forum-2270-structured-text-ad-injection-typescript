@@ -1,0 +1,16 @@
+query Layout {
+  _site {
+    faviconMetaTags {
+      attributes
+      content
+      tag
+    }
+  }
+  layout {
+    mainColor {
+      red
+      blue
+      green
+    }
+  }
+}
