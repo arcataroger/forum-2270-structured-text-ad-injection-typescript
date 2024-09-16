@@ -10,19 +10,12 @@ import type {ContentPage} from '@/components/WithRealTimeUpdates/types';
 import DateIcon from '@/components/svgs/DateIcon';
 import {buildUrl} from '@/utils/globalPageProps';
 import transformDate from '@/utils/transformDate';
-import {
-    isBlockquote,
-    isHeading,
-    isLink,
-    isParagraph,
-    type RenderRule,
-    type TrasformFn
-} from 'datocms-structured-text-utils';
+import {isBlockquote, isHeading, isLink, isParagraph} from 'datocms-structured-text-utils';
 import Link from 'next/link';
 import {notFound} from 'next/navigation';
 import {renderNodeRule, StructuredText, type StructuredTextDocument} from 'react-datocms';
 import type {PageProps, Query} from './meta';
-import {PostQuery} from "@/graphql/types/graphql";
+import {type PostQuery} from "@/graphql/types/graphql";
 
 const Content: ContentPage<PageProps, Query> = ({
                                                     data,
@@ -132,7 +125,7 @@ const Content: ContentPage<PageProps, Query> = ({
     } as PostQueryWithDFP['post']['content']
 
     // Define a new render rule
-    const dfpNodeRule: RenderRule<TrasformFn, TrasformFn, TrasformFn> = renderNodeRule(
+    const dfpNodeRule = renderNodeRule(
         // @ts-expect-error The node renderer doesn't understand our custom (fake) node type, but that's OK
         (node) => node.type === 'dfp',
         () => {
