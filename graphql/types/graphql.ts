@@ -755,7 +755,7 @@ export type DocumentationPageRecord = RecordInterface & {
   _status: ItemStatus;
   _unpublishingScheduledAt?: Maybe<Scalars['DateTime']['output']>;
   _updatedAt: Scalars['DateTime']['output'];
-  children?: Maybe<Array<Maybe<DocumentationPageRecord>>>;
+  children: Array<DocumentationPageRecord>;
   content: DocumentationPageModelContentField;
   id: Scalars['ItemId']['output'];
   parent?: Maybe<DocumentationPageRecord>;
@@ -5386,7 +5386,7 @@ export type DocumentationHomePageQuery = { __typename?: 'Query', documentationHo
 export type DocumentationSidebarQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DocumentationSidebarQuery = { __typename?: 'Query', allDocumentationPages: Array<{ __typename: 'DocumentationPageRecord', title: string, subtitle?: string | null, slug: string, id: string, children?: Array<{ __typename: 'DocumentationPageRecord', title: string, subtitle?: string | null, slug: string, id: string, content: { __typename?: 'DocumentationPageModelContentField', value: unknown }, children?: Array<{ __typename: 'DocumentationPageRecord', title: string, subtitle?: string | null, slug: string, id: string, content: { __typename?: 'DocumentationPageModelContentField', value: unknown }, children?: Array<{ __typename: 'DocumentationPageRecord', title: string, subtitle?: string | null, slug: string, id: string, content: { __typename?: 'DocumentationPageModelContentField', value: unknown }, children?: Array<{ __typename: 'DocumentationPageRecord', title: string, subtitle?: string | null, slug: string, id: string, content: { __typename?: 'DocumentationPageModelContentField', value: unknown } } | null> | null } | null> | null } | null> | null } | null> | null }>, documentationHome?: { __typename?: 'DocumentationHomeRecord', footerText?: string | null, logo: { __typename?: 'FileField', url: string, width?: number | null, height?: number | null } } | null };
+export type DocumentationSidebarQuery = { __typename?: 'Query', allDocumentationPages: Array<{ __typename: 'DocumentationPageRecord', title: string, subtitle?: string | null, slug: string, id: string, children: Array<{ __typename: 'DocumentationPageRecord', title: string, subtitle?: string | null, slug: string, id: string, content: { __typename?: 'DocumentationPageModelContentField', value: unknown }, children: Array<{ __typename: 'DocumentationPageRecord', title: string, subtitle?: string | null, slug: string, id: string, content: { __typename?: 'DocumentationPageModelContentField', value: unknown }, children: Array<{ __typename: 'DocumentationPageRecord', title: string, subtitle?: string | null, slug: string, id: string, content: { __typename?: 'DocumentationPageModelContentField', value: unknown }, children: Array<{ __typename: 'DocumentationPageRecord', title: string, subtitle?: string | null, slug: string, id: string, content: { __typename?: 'DocumentationPageModelContentField', value: unknown } }> }> }> }> }>, documentationHome?: { __typename?: 'DocumentationHomeRecord', footerText?: string | null, logo: { __typename?: 'FileField', url: string, width?: number | null, height?: number | null } } | null };
 
 export type LayoutQueryVariables = Exact<{ [key: string]: never; }>;
 
