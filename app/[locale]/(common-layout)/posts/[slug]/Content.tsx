@@ -76,7 +76,7 @@ const Content: ContentPage<PageProps, Query> = ({
     /** First we define our custom types */
 
     // Create a new type for our injected node
-    type DFPNode = { type: 'dfp'}
+    type DFPNode = { type: 'dfp' }
 
     // We'll extend StructuredTextDocument from react-datocms
     interface StructuredTextDocumentWithDFP extends StructuredTextDocument {
@@ -129,7 +129,16 @@ const Content: ContentPage<PageProps, Query> = ({
         // @ts-expect-error The node renderer doesn't understand our custom (fake) node type, but that's OK
         (node) => node.type === 'dfp',
         () => {
-            return <div style={{width: '100px', height: '100px', background: 'orange', padding: '10px', margin: "auto"}}>AD GOES HERE</div>;
+            return <div style={{
+                width: '100px',
+                height: '100px',
+                background: 'orange',
+                padding: '10px',
+                margin: "20px auto",
+                textAlign: "center",
+                display: 'flex',
+                alignItems: 'center',
+            }}>AD GOES HERE</div>;
         }
     )
 
